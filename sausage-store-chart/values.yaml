@@ -109,7 +109,7 @@ infra:
     database: sausage-store
     username: store
     password: storepassword
-    storage: 1Gi
+    storage: 2Gi
     resources:
       requests:
         cpu: 50m
