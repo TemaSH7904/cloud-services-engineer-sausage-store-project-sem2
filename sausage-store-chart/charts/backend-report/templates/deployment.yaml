@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-backend-report
+spec:
+{{- if not .Values.hpa.enabled }}
+  replicas: {{ .Values.replicas }}
+{{- end }}
+  strategy:
+    type: {{ .Values.strategy.type }}
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-backend-report
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-backend-report
+    spec:
+      containers:
+        - name: backend-report
+          image: {{ .Values.image | quote }}
+          imagePullPolicy: {{ .Values.global.imagePullPolicy }}
+          ports:
+            - name: http
+              containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: {{ .Release.Name }}-backend-report-conf
+          env:
+            - name: DB
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-backend-report-secret
+                  key: DB
+          resources:
+{{ toYaml .Values.resources | indent 12 }}

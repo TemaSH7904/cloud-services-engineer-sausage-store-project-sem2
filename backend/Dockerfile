@@ -12,13 +12,13 @@ COPY *.xml ./
 RUN mvn package -Dversion.application=${VERSION}
 
 # release
-FROM openjdk:16-jdk-alpine
+FROM eclipse-temurin:17-jre-alpine
 ARG VERSION=${VERSION}
 WORKDIR /app
 # создаём пользователя jaruser
 RUN addgroup --system jaruser \
     && adduser -S -s /bin/false -G jaruser jaruser -D -H \
-    && apk add --no-cache dumb-init==1.2.5-r0 \
+    && apk add --no-cache dumb-init \
     && apk add --update curl \
     && rm -rf /var/cache/apk/* \
     && mkdir -p /logs/reports \
@@ -28,4 +28,4 @@ COPY --chown=jaruser:jaruser \
 EXPOSE 8080
 # приложение будет запускаться под пользователем jaruser
 USER jaruser
-ENTRYPOINT ["dumb-init", "java", "-jar", "-Dmyserver.bindPort=8080", "./sausage-store.jar"]
+ENTRYPOINT ["dumb-init", "java", "-Dmyserver.bindPort=8080", "-jar", "./sausage-store.jar"]
